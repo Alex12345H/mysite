@@ -1,22 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Würfel-Parcours-Spiel</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <label for="username">Username:</label><br>
-      <input type="text" id="username" name="username"><br>
-      <label for="password">Password:</label><br>
-      <input type="password" id="password" name="password"><br><br>
-      <input type="submit" value="Login">
-    </form>
+
+  <div class="game-container">
+    <div class="player" id="player"></div>
+    <div class="goal" id="goal"></div>
+    <div class="obstacle" id="obstacle"></div>
   </div>
-  
+
   <script src="script.js"></script>
 </body>
 </html>

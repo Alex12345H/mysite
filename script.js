@@ -1,47 +1,70 @@
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-  event.preventDefault();
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
+const player = document.getElementById('player');
+const goal = document.getElementById('goal');
+const obstacle = document.getElementById('obstacle');
+const gameContainer = document.querySelector('.game-container');
 
-  // Hier sollte die Überprüfung der eingegebenen Benutzerdaten erfolgen
-  if (username === 'alex' && password === '123456') {
-    // Wenn die Benutzerdaten korrekt sind, leite zur Bildupload-Seite weiter
-    window.location.href = 'bildupload.html'; // Ändere 'bildupload.html' zur tatsächlichen Upload-Seite
-  } else {
-    alert('Ungültige Anmeldeinformationen. Bitte versuche es erneut.');
+let level = 1;
+
+gameContainer.addEventListener('mousemove', function(event) {
+  if (level <= 10) {
+    const x = event.clientX - gameContainer.getBoundingClientRect().left - player.offsetWidth / 2;
+    const y = event.clientY - gameContainer.getBoundingClientRect().top - player.offsetHeight / 2;
+
+    const maxX = gameContainer.offsetWidth - player.offsetWidth;
+    const maxY = gameContainer.offsetHeight - player.offsetHeight;
+
+    const boundedX = Math.min(Math.max(0, x), maxX);
+    const boundedY = Math.min(Math.max(0, y), maxY);
+
+    player.style.left = boundedX + 'px';
+    player.style.top = boundedY + 'px';
+
+    const playerRect = player.getBoundingClientRect();
+    const goalRect = goal.getBoundingClientRect();
+    const obstacleRect = obstacle.getBoundingClientRect();
+
+    if (isColliding(playerRect, goalRect)) {
+      if (level === 10) {
+        alert('Glückwunsch! Du hast alle Level abgeschlossen!');
+        level = 1;
+      } else {
+        level++;
+        alert('Level ' + level);
+        setLevel(level);
+      }
+    }
+
+    if (isColliding(playerRect, obstacleRect)) {
+      alert('Du hast das Hindernis berührt! Versuche es erneut.');
+      setLevel(level);
+    }
   }
 });
 
-window.addEventListener('DOMContentLoaded', function() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const imageUrl = urlParams.get('image');
+function isColliding(a, b) {
+  return !(
+    a.bottom < b.top ||
+    a.top > b.bottom ||
+    a.right < b.left ||
+    a.left > b.right
+  );
+}
 
-  if (imageUrl) {
-    // Hier kannst du die Logik für das Hochladen des Bildes implementieren
-    // Beispiel: Hier wird die URL des Bildes in der Konsole ausgegeben
-    console.log('Bild hochgeladen von URL:', imageUrl);
-    // Füge die Logik für das Hochladen des Bildes hinzu
-    // Zum Beispiel könntest du AJAX verwenden, um das Bild hochzuladen
-    // Hier ist ein Beispiel mit fetch():
-    fetch(imageUrl)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok.');
-        }
-        return response.blob();
-      })
-      .then(blob => {
-        // Hier hast du das Bild als Blob, und du kannst es weiterverarbeiten
-        // Beispiel: Zeige das Bild in einer Image-Tag auf der Seite an
-        const imageElement = document.createElement('img');
-        imageElement.src = URL.createObjectURL(blob);
-        document.body.appendChild(imageElement);
+function setLevel(level) {
+  const goalPosition = getNewPosition();
+  goal.style.top = goalPosition.top + 'px';
+  goal.style.left = goalPosition.left + 'px';
 
-        // Hier könntest du auch die Logik für das Hochladen des Bildes auf deinen Server einfügen
-        // Du müsstest den Blob an deinen Server senden und dort verarbeiten
-      })
-      .catch(error => {
-        console.error('There was a problem with fetching the image:', error);
-      });
-  }
-});
+  const obstaclePosition = getNewPosition();
+  obstacle.style.top = obstaclePosition.top + 'px';
+  obstacle.style.left = obstaclePosition.left + 'px';
+}
+
+function getNewPosition() {
+  const posX = Math.floor(Math.random() * (gameContainer.offsetWidth - 50));
+  const posY = Math.floor(Math.random() * (gameContainer.offsetHeight - 50));
+
+  return { top: posY, left: posX };
+}
+
+setLevel(level);
